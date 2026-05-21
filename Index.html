@@ -1,0 +1,898 @@
+ <!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevLearn Pro V5 - Kelpinz Developer Ecosystem</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* CSS Utama - Premium Glassmorphism Theme */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: #03030c;
+            min-height: 100vh;
+            color: #f1f5f9;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Latar Belakang Grafis Aurora & Meteor */
+        #meteorCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .aurora-glow {
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, rgba(168, 85, 247, 0) 70%);
+            top: -100px;
+            left: -100px;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Tombol Navigasi Hamburger Musik */
+        .menu-toggle-btn {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .menu-toggle-btn:hover {
+            background: rgba(56, 189, 248, 0.2);
+            border-color: #38bdf8;
+            transform: scale(1.05);
+        }
+
+        /* Sidebar Musik Premium Ultra-Transparan */
+        .sidebar-menu {
+            position: fixed;
+            top: 0;
+            right: -390px;
+            width: 360px;
+            height: 100vh;
+            background: rgba(4, 4, 12, 0.7);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border-left: 1px solid rgba(255, 255, 255, 0.06);
+            z-index: 99;
+            transition: right 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 100px 25px 30px 25px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -20px 0 60px rgba(0,0,0,0.7);
+        }
+
+        .sidebar-menu.open {
+            right: 0;
+        }
+
+        /* Container Aplikasi Utama */
+        .main-app-container {
+            width: 100%;
+            max-width: 950px;
+            background: rgba(10, 11, 26, 0.45);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 36px;
+            box-shadow: 0 50px 120px rgba(0, 0, 0, 0.8);
+            position: relative;
+            z-index: 2;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            margin: 60px auto;
+        }
+
+        /* SPA Halaman Management */
+        .app-page {
+            display: none;
+            width: 100%;
+            flex-direction: column;
+            padding: 60px 50px;
+            animation: pageFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .app-page.active-view {
+            display: flex;
+        }
+
+        @keyframes pageFadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, #38bdf8 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* TAMPILAN 1: DASHBOARD */
+        .dash-hero {
+            text-align: center;
+            padding: 40px 10px;
+        }
+
+        .dash-badge {
+            background: rgba(56, 189, 248, 0.08);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            color: #38bdf8;
+            padding: 10px 24px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 25px;
+            letter-spacing: 0.5px;
+        }
+
+        .dash-hero h1 {
+            font-size: 46px;
+            font-weight: 800;
+            line-height: 1.25;
+            margin-bottom: 22px;
+            letter-spacing: -1px;
+        }
+
+        .dash-hero p {
+            font-size: 16px;
+            color: #94a3b8;
+            max-width: 650px;
+            margin: 0 auto 35px auto;
+            line-height: 1.7;
+        }
+
+        .btn-premium {
+            background: linear-gradient(135deg, #38bdf8 0%, #a855f7 100%);
+            color: #ffffff;
+            border: none;
+            padding: 18px 45px;
+            border-radius: 16px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 20px 40px rgba(168, 85, 247, 0.25);
+            transition: all 0.3s;
+        }
+
+        .btn-premium:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 25px 50px rgba(56, 189, 248, 0.35);
+        }
+
+        /* TAMPILAN 2: LOADING CENTERED VIDEO */
+        #loadingView {
+            justify-content: center;
+            align-items: center;
+            min-height: 550px;
+        }
+
+        .loading-container {
+            width: 100%;
+            max-width: 620px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .video-wrapper {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000000;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            overflow: hidden;
+            box-shadow: 0 30px 70px rgba(0,0,0,0.9);
+        }
+
+        .video-wrapper video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #38bdf8 0%, #a855f7 100%);
+            border-radius: 20px;
+        }
+
+        /* HARMONISASI PANEL MUSIK SIDEBAR */
+        .sidebar-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #38bdf8;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding-bottom: 15px;
+        }
+
+        .upload-area {
+            background: rgba(255,255,255,0.01);
+            border: 1px dashed rgba(255,255,255,0.12);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            margin-bottom: 25px;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .upload-area:hover {
+            border-color: #38bdf8;
+            background: rgba(56, 189, 248, 0.02);
+        }
+
+        .upload-area input[type=file] {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .player-status {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 16px;
+            border-radius: 14px;
+            font-size: 13px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .playlist-wrapper {
+            flex-grow: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .track-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.04);
+            padding: 12px 16px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+
+        .track-card:hover {
+            background: rgba(56, 189, 248, 0.06);
+            border-color: rgba(56, 189, 248, 0.2);
+        }
+
+        .track-name-click {
+            flex-grow: 1;
+            font-size: 13px;
+            cursor: pointer;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .btn-delete-public {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            padding: 6px;
+            font-size: 13px;
+            transition: transform 0.2s;
+        }
+
+        .btn-delete-public:hover {
+            transform: scale(1.1);
+        }
+
+        /* AREA KARTU PEMBELAJARAN (MODUL BERBEDA) */
+        .learn-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding-bottom: 25px;
+            margin-bottom: 35px;
+        }
+
+        .learning-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+            width: 100%;
+        }
+
+        .step-card {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            transition: border 0.3s;
+        }
+
+        .step-card:hover {
+            border-color: rgba(168, 85, 247, 0.2);
+        }
+
+        .step-num {
+            font-size: 10px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #38bdf8 0%, #a855f7 100%);
+            padding: 5px 14px;
+            border-radius: 20px;
+            width: max-content;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+        }
+
+        .step-title {
+            font-size: 19px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .step-desc {
+            font-size: 14px;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        .step-core {
+            font-size: 13px;
+            color: #38bdf8;
+            font-weight: 600;
+            background: rgba(56, 189, 248, 0.03);
+            padding: 12px 16px;
+            border-radius: 10px;
+            border-left: 3.5px solid #38bdf8;
+            line-height: 1.5;
+        }
+
+        .code-snippet {
+            background: #020206;
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 14px;
+            padding: 18px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            color: #a5f3fc;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+            line-height: 1.6;
+        }
+
+        .app-footer {
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: 12px;
+            color: #64748b;
+            letter-spacing: 0.3px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="aurora-glow"></div>
+<canvas id="meteorCanvas"></canvas>
+
+<button class="menu-toggle-btn" onclick="toggleSidebarMenu()">
+    <i class="fa-solid fa-bars" id="menuIcon"></i>
+</button>
+
+<div class="sidebar-menu" id="musicSidebar">
+    <div class="sidebar-title">
+        <i class="fa-solid fa-compact-disc"></i> 
+        <span>Ruang Media Publik</span>
+    </div>
+    
+    <div class="upload-area">
+        <i class="fa-solid fa-cloud-arrow-up" style="font-size:24px; color:#38bdf8; margin-bottom:8px;"></i>
+        <p style="font-size:12px; color:#94a3b8;">Klik untuk Unggah Audio/Video</p>
+        <input type="file" id="mediaUploader" accept="audio/*,video/*" onchange="processMediaUpload(event)">
+    </div>
+
+    <div class="player-status">
+        <div style="font-size:10px; color:#a855f7; font-weight:700; text-transform:uppercase; margin-bottom:4px; letter-spacing:0.5px;">Now Playing</div>
+        <div id="statusPlayback" style="color:#e2e8f0; font-weight:500; font-size:12.5px;">Belum ada lagu diputar</div>
+        <div style="display:flex; gap:10px; margin-top:12px;">
+            <button onclick="controlTrackPower('play')" style="background:#fff; color:#000; border:none; padding:5px 12px; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer;">PLAY</button>
+            <button onclick="controlTrackPower('pause')" style="background:rgba(255,255,255,0.08); border:none; padding:5px 12px; border-radius:6px; font-size:11px; font-weight:700; color:#fff; cursor:pointer;">PAUSE</button>
+        </div>
+    </div>
+
+    <div style="font-size:11px; font-weight:700; margin-bottom:12px; color:#64748b; text-transform:uppercase; letter-spacing:0.5px;">Daftar Putar Publik</div>
+    <div class="playlist-wrapper" id="sharedPlaylistContainer"></div>
+    <audio id="globalAudioCore" loop></audio>
+</div>
+
+<div class="main-app-container">
+
+    <div id="dashboardView" class="app-page active-view">
+        <div class="dash-hero">
+            <span class="dash-badge"><i class="fa-solid fa-shield-halved"></i> Architected by Kelpinz Developer</span>
+            <h1>Kuasai Terobosan Baru<br><span class="text-gradient">300 Modul Web Dev</span></h1>
+            <p>Akses kurikulum pemrograman termewah dengan pemetaan modul terpisah. Setiap bagian disusun secara independen, lengkap dengan simulasi logika mekanis, dan skrip siap pakai.</p>
+            <button class="btn-premium" onclick="startLearningWorkflow()">
+                <span>Mulai Struktur Belajar</span> <i class="fa-solid fa-arrow-right-long"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="loadingView" class="app-page">
+        <div class="loading-container">
+            <div class="video-wrapper">
+                <video id="learnVideo" playsinline preload="auto">
+                    <source src="https://www.image2url.com/r2/default/videos/1779115207406-45550fbd-9ee3-4f3f-ba01-feac5b79db5e.mp4" type="video/mp4">
+                </video>
+            </div>
+            <div style="width: 100%;">
+                <div class="progress-track">
+                    <div id="progressBar" class="progress-bar-fill"></div>
+                </div>
+                <div style="margin-top:14px; font-size:13.5px; color:#94a3b8;">Menyinkronkan data kurikulum inti Kelpinz... <span id="countdownText" style="color:#38bdf8; font-weight:700;">18</span>s</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="learningContentView" class="app-page">
+        <div class="learn-header">
+            <span style="font-size:10px; font-weight:800; color:#a855f7; text-transform:uppercase; letter-spacing:0.5px;">Kelpinz Premium Workspace</span>
+            <h2>Kurikulum Inti Web Dev (Modul 001 - 025)</h2>
+        </div>
+        
+        <div class="learning-timeline" id="timelineWorkspaceContainer"></div>
+    </div>
+
+    <div class="app-footer">
+        &copy; 2026 Crafted with Passion by <strong style="color: #38bdf8;">Kelpinz</strong>. All Rights Reserved.
+    </div>
+
+</div>
+
+<script>
+    /* =========================================================
+       DATABASE LENGKAP: DATA MODUL 1 - 25 YANG BERBEDA-BEDA
+       ========================================================= */
+    const dataModulBelajar = [
+        {
+            title: "Deklarasi Dokumen Tipe (<!DOCTYPE html>)",
+            desc: "Instruksi wajib awal dokumen untuk memberi tahu mesin browser bahwa halaman diproses menggunakan standar spesifikasi HTML5 terbaru.",
+            work: "Mencegah browser masuk ke dalam 'Quirks Mode' (mode rendering rendering usang), sehingga pembacaan layout CSS modern menjadi presisi.",
+            code: "<!DOCTYPE html>"
+        },
+        {
+            title: "Elemen Root Pembungkus (<html lang='id'>)",
+            desc: "Membahas pembungkus kasta tertinggi seluruh dokumen dan penerapan atribut bahasa demi kebutuhan aksesibilitas pembaca layar (screen reader).",
+            work: "Atribut 'lang' menginstruksikan bot mesin pencari dan browser untuk menggunakan logat atau kamus bahasa lokal yang tepat sesuai target negara.",
+            code: "<html lang=\"id\">\n    \n</html>"
+        },
+        {
+            title: "Meta Character Set (<meta charset='UTF-8'>)",
+            desc: "Mengonfigurasi sistem pengodean karakter internasional agar seluruh simbol teks, huruf asing, dan emoji di website tidak pecah/rusak.",
+            work: "Browser mengonversi bit data mentah biner server menjadi simbol karakter teks terpadu berdasarkan standar Unicode UTF-8 secara universal.",
+            code: "<meta charset=\"UTF-8\">"
+        },
+        {
+            title: "Meta Viewport untuk Skala Responsif",
+            desc: "Mengontrol dimensi area pandang layar (viewport) agar rasio website otomatis menyesuaikan lebar layar smartphone maupun desktop.",
+            work: "Memaksa engine browser seluler menyamakan lebar virtual CSS piksel dengan lebar fisik komponen layar asli perangkat keras pengguna.",
+            code: "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">"
+        },
+        {
+            title: "Tag Judul Utama Tab Browser (<title>)",
+            desc: "Menentukan teks string yang muncul pada bar tab browser atas, sekaligus menjadi parameter indeks paling krusial bagi algoritma SEO Google.",
+            work: "Robot crawler web Google mengekstrak teks di dalam tag ini untuk dijadikan sebagai tajuk utama biru yang dapat diklik pada halaman pencarian.",
+            code: "<title>Platform Rekayasa Web - Developer Kelpinz</title>"
+        },
+        {
+            title: "Meta Description Rangkuman Hasil Pencarian",
+            desc: "Menyediakan cuplikan ringkasan teks pendek mengenai gambaran isi konten utama dari keseluruhan dokumen website Anda.",
+            work: "Teks disaring oleh algoritma pencari untuk ditampilkan sebagai deskripsi abu-abu (snippet) tepat di bawah judul utama link pencarian Google.",
+            code: "<meta name=\"description\" content=\"Belajar pemrograman web terstruktur dari nol hingga mahir bersama ekosistem Kelpinz.\">"
+        },
+        {
+            title: "Struktur Hierarki Judul Teks (<h1> sampai <h6>)",
+            desc: "Mengatur penulisan judul berita artikel berdasarkan bobot kepentingannya, dari yang terbesar (h1) hingga sub-informasi terkecil (h6).",
+            work: "Membentuk pohon outline arsitektur dokumen terstruktur agar ramah terhadap pembaca disabilitas dan mempercepat kerja mesin bot robot.",
+            code: "<h1>Kompiler Utama V5</h1>\n<h2>Sub-Bab Dokumentasi Sistem</h2>"
+        },
+        {
+            title: "Tag Paragraf Narasi Teks (<p>)",
+            desc: "Elemen dasar yang digunakan untuk membungkus blok baris teks narasi atau deskripsi panjang artikel agar tersusun rapi.",
+            work: "Sistem grafis browser otomatis memberikan jarak ruang vertikal kosong (margin-top dan margin-bottom) bawaan pada setiap blok elemen ini.",
+            code: "<p>Ini adalah baris paragraf teks materi yang dibangun secara mandiri.</p>"
+        },
+        {
+            title: "Hyperlink Tautan Navigasi (<a>)",
+            desc: "Membuat jangkar tautan hidup yang dapat diklik untuk memindahkan pengguna antar halaman web internal maupun eksternal internet.",
+            work: "Atribut 'href' mengunci alamat URL target. Saat diklik, browser menghentikan sesi aktif lalu mengirim permintaan paket data baru.",
+            code: "<a href=\"https://github.com\" target=\"_blank\">Kunjungi Repositori</a>"
+        },
+        {
+            title: "Penyematan Media Visual Gambar (<img>)",
+            desc: "Memasukkan gambar visual ke dalam susunan tata letak halaman dengan pelindung teks cadangan jika gambar gagal dimuat.",
+            work: "Browser mengirimkan HTTP request terpisah ke jalur lokasi 'src' untuk mengunduh aset gambar lalu merendernya sesuai rasio aspek objek asli.",
+            code: "<img src=\"foto-profil.jpg\" alt=\"Foto Profil Resmi Kelpinz\" width=\"150\">"
+        },
+        {
+            title: "Daftar Poin Urut Numerik (<ol> dan <li>)",
+            desc: "Membuat daftar baris poin data informasi yang tersusun rapi berdasarkan urutan angka atau abjad alfabetik secara otomatis.",
+            work: "Elemen induk 'ol' memerintahkan browser memberikan penomoran indeks angka urut menaik pada setiap anak elemen 'li' di dalamnya.",
+            code: "<ol>\n    <li>Buka Aplikasi Text Editor</li>\n    <li>Tulis Struktur HTML</li>\n</ol>"
+        },
+        {
+            title: "Daftar Poin Simbol Acak (<ul>)",
+            desc: "Membuat daftar baris informasi acak yang tidak memerlukan urutan kronologis, melainkan menggunakan tanda simbol peluru (bullet).",
+            work: "Browser menonaktifkan penghitungan angka dan menggantinya dengan simbol lingkaran kecil bawaan mesin grafis UI browser.",
+            code: "<ul>\n    <li>Bahasa JavaScript</li>\n    <li>Bahasa CSS Modern</li>\n</ul>"
+        },
+        {
+            title: "Kontainer Generik Sektor Blok (<div>)",
+            desc: "Elemen pembungkus tanpa arti bawaan yang bertugas mengelompokkan elemen-elemen kecil agar mudah dimanipulasi tata letaknya via CSS.",
+            work: "Menggunakan tipe tampilan 'Block-level', artinya kotak div otomatis memakan lebar penuh 100% dan mendorong elemen berikutnya ke baris baru.",
+            code: "<div class=\"panel-box\">\n    <h3>Fitur Utama</h3>\n</div>"
+        },
+        {
+            title: "Kontainer Generik Baris Lokal (<span>)",
+            desc: "Digunakan untuk membungkus kata atau frasa teks tertentu di tengah kalimat tanpa merusak tatanan baris teks yang sedang berjalan.",
+            work: "Menggunakan tipe tampilan 'Inline', hanya mengambil ruang selebar konten teks aslinya saja tanpa memicu pembuatan baris baru.",
+            code: "Gunakan warna <span style=\"color:#38bdf8;\">Biru</span> untuk efek masa depan."
+        },
+        {
+            title: "Semantik Penunjuk Menu Utama (<nav>)",
+            desc: "Menandai wilayah struktur website khusus yang merangkum kumpulan link navigasi atau menu menu utama aplikasi.",
+            work: "Membantu robot mesin pencari langsung membaca dan memetakan arsitektur peta tautan internal website secara efisien.",
+            code: "<nav>\n    <a href=\"/dashboard\">Dashboard</a>\n    <a href=\"/music\">Music Room</a>\n</nav>"
+        },
+        {
+            title: "Semantik Blok Berita Mandiri (<article>)",
+            desc: "Membungkus sebuah kesatuan konten utuh yang bersifat independen, seperti satu postingan blog penuh atau lembar berita utama.",
+            work: "Memisahkan teks data inti berita dari komponen eksternal halaman web seperti sidebar, iklan, ataupun footer.",
+            code: "<article>\n    <h2>Update Engine V5</h2>\n    <p>Detail log pembaruan sistem oleh Kelpinz...</p>\n</article>"
+        },
+        {
+            title: "Semantik Info Tambahan Samping (<aside>)",
+            desc: "Menampung konten sekunder atau pelengkap, seperti widget media sosial, daftar artikel populer, atau unit iklan luar.",
+            work: "Mengomunikasikan ke browser bahwa informasi di dalamnya bukanlah bagian dari data primer, melainkan pelengkap arsitektur.",
+            code: "<aside>\n    <h4>Penulis: Kelpinz</h4>\n</aside>"
+        },
+        {
+            title: "Semantik Bagian Kaki Dokumen (<footer>)",
+            desc: "Sektor penutup paling bawah website untuk meletakkan info hak cipta, kontak bantuan, atau tautan kebijakan lisensi.",
+            work: "Menandai titik akhir koordinat dari keseluruhan susunan hierarki tubuh (body) dokumen halaman web.",
+            code: "<footer>\n    <p>&copy; 2026 Kelpinz Dev. Hak Cipta Dilindungi.</p>\n</footer>"
+        },
+        {
+            title: "Form Input Teks Isian Bebas (<input type='text'>)",
+            desc: "Membuat kotak isian satu baris kosong agar pengguna dapat mengetikkan teks string bebas seperti nama lengkap.",
+            work: "Menangkap ketukan keyboard user dan menyimpannya sebagai nilai memori elemen objek untuk dikirim ke backend server.",
+            code: "<input type=\"text\" placeholder=\"Masukkan Username Anda\">"
+        },
+        {
+            title: "Input Tersandi Keamanan (<input type='password'>)",
+            desc: "Kolom khusus untuk mengetikkan kata sandi akun yang secara otomatis mengaburkan karakter asli demi menjaga privasi pengguna.",
+            work: "Browser menyembunyikan input asli dan merendernya menjadi simbol dot lingkaran hitam masker secara real-time.",
+            code: "<input type=\"password\" placeholder=\"Masukkan Password Sandi\">"
+        },
+        {
+            title: "Tombol Submit Pemicu Data (<button type='submit'>)",
+            desc: "Tombol interaksi vital yang bertugas memicu pengiriman seluruh kumpulan data formulir menuju gerbang pemrosesan server.",
+            work: "Mengaktifkan fungsi bawaan form untuk mengemas isian menjadi sebuah paket HTTP POST/GET terenkripsi.",
+            code: "<button type=\"submit\">Verifikasi Akses Sekarang</button>"
+        },
+        {
+            title: "Pemutar File Audio Bawaan (<audio controls>)",
+            desc: "Menyisipkan instrumen pemutar musik ke dalam dokumen web tanpa memerlukan tambahan library pihak ketiga.",
+            work: "Atribut 'controls' memicu browser untuk merender tombol play, volume, dan bar durasi asli bawaan sistem operasi.",
+            code: "<audio src=\"instrumental.mp3\" controls></audio>"
+        },
+        {
+            title: "Pemutar Konten Visual Video (<video controls>)",
+            desc: "Menampilkan file video interaktif langsung di atas dokumen layout dengan opsi pengaturan layar penuh dan volume.",
+            work: "Mengaktifkan engine decoder internal grafis browser untuk mengurai frame piksel visual video langsung di atas web.",
+            code: "<video src=\"background-motion.mp4\" width=\"100%\" controls></video>"
+        },
+        {
+            title: "Struktur Matriks Baris Tabel (<table> dan <tr>)",
+            desc: "Membuat wadah tabel data guna menyajikan data statistik secara teratur dan transparan.",
+            work: "Menghitung koordinat sel data secara geometris agar lebar garis pembatas simetris mengikuti panjang konten teks terbesar.",
+            code: "<table border=\"1\">\n    <tr>\n        <td>Modul</td>\n        <td>Status</td>\n    </tr>\n</table>"
+        },
+        {
+            title: "Bingkai Sandboxed Eksternal (<iframe>)",
+            desc: "Menyematkan halaman web lain atau media luar (seperti Google Maps / YouTube) agar muncul secara utuh di web kita.",
+            work: "Membuat ruang isolasi mandiri (sandbox browser terpisah) di dalam struktur utama dokumen halaman web aktif.",
+            code: "<iframe src=\"https://example.com\" width=\"100%\" height=\"350\"></iframe>"
+        }
+    ];
+
+    /* =========================================================
+       ENGINE 1: SIDEBAR SLIDE MANAGER (GARIS TIGA)
+       ========================================================= */
+    function toggleSidebarMenu() {
+        const sidebar = document.getElementById('musicSidebar');
+        const icon = document.getElementById('menuIcon');
+        sidebar.classList.toggle('open');
+        icon.className = sidebar.classList.contains('open') ? "fa-solid fa-xmark" : "fa-solid fa-bars";
+    }
+
+    /* =========================================================
+       ENGINE 2: GRAPHICS METEOR STREAM WITH CANVAS
+       ========================================================= */
+    const canvas = document.getElementById('meteorCanvas');
+    const ctx = canvas.getContext('2d');
+    let cw = canvas.width = window.innerWidth;
+    let ch = canvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+        cw = canvas.width = window.innerWidth;
+        ch = canvas.height = window.innerHeight;
+    });
+
+    class PremiumMeteor {
+        constructor() { this.reset(); }
+        reset() {
+            this.x = Math.random() * cw * 1.3;
+            this.y = -40;
+            this.speed = Math.random() * 3 + 4;
+            this.length = Math.random() * 80 + 60;
+            this.alpha = Math.random() * 0.25 + 0.05;
+        }
+        update() {
+            this.x -= this.speed;
+            this.y += this.speed;
+            if(this.y > ch || this.x < -100) this.reset();
+        }
+        draw() {
+            ctx.beginPath();
+            let g = ctx.createLinearGradient(this.x, this.y, this.x + this.length, this.y - this.length);
+            g.addColorStop(0, `rgba(56, 189, 248, ${this.alpha})`);
+            g.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.strokeStyle = g;
+            ctx.lineWidth = 1.2;
+            ctx.moveTo(this.x, this.y);
+            ctx.lineTo(this.x + this.length, this.y - this.length);
+            ctx.stroke();
+        }
+    }
+    const meteorSwarm = Array.from({length: 8}, () => new PremiumMeteor());
+    function animationLoop() {
+        ctx.clearRect(0,0,cw,ch);
+        meteorSwarm.forEach(m => { m.update(); m.draw(); });
+        requestAnimationFrame(animationLoop);
+    }
+    animationLoop();
+
+    /* =========================================================
+       ENGINE 3: DASHBOARD -> LOADING -> WORKSPACE WORKFLOW
+       ========================================================= */
+    function startLearningWorkflow() {
+        // Alihkan dari Dashboard ke Loading View
+        document.getElementById('dashboardView').classList.remove('active-view');
+        document.getElementById('loadingView').classList.add('active-view');
+        
+        const video = document.getElementById('learnVideo');
+        video.muted = false;
+        video.volume = 1.0;
+        // Penanganan kebijakan auto-play browser modern
+        video.play().catch(() => { video.muted = true; video.play(); });
+
+        let maxDuration = 18;
+        let countElapsed = 0;
+        const fillBar = document.getElementById('progressBar');
+        const countTxt = document.getElementById('countdownText');
+
+        const engineClock = setInterval(() => {
+            countElapsed += 0.1;
+            let percentage = (countElapsed / maxDuration) * 100;
+            fillBar.style.width = `${Math.min(percentage, 100)}%`;
+            
+            let timeLeft = Math.ceil(maxDuration - countElapsed);
+            countTxt.textContent = timeLeft > 0 ? timeLeft : 0;
+
+            if(countElapsed >= maxDuration) {
+                clearInterval(engineClock);
+                video.pause();
+                compileAndRenderWorkspace();
+            }
+        }, 100);
+    }
+
+    /* =========================================================
+       ENGINE 4: GENERATOR & RENDERER DATA MODUL ASLI BERBEDA
+       ========================================================= */
+    function compileAndRenderWorkspace() {
+        const container = document.getElementById('timelineWorkspaceContainer');
+        container.innerHTML = ''; // Reset container dari data kosong
+
+        // Lakukan perulangan menyuntikkan data asli unik dari database array Kelpinz
+        dataModulBelajar.forEach((item, index) => {
+            const numText = String(index + 1).padStart(3, '0');
+            const card = document.createElement('div');
+            card.className = 'step-card';
+            card.innerHTML = `
+                <div class="step-num">Modul ${numText}</div>
+                <div class="step-title">${item.title}</div>
+                <div class="step-desc">${item.desc}</div>
+                <div class="step-core"><strong>Mekanisme Cara Kerja:</strong> ${item.work}</div>
+                <div class="code-snippet">${escapeHTMLCharacters(item.code)}</div>
+            `;
+            container.appendChild(card);
+        });
+
+        // Tampilkan ruang belajar
+        document.getElementById('loadingView').classList.remove('active-view');
+        document.getElementById('learningContentView').classList.add('active-view');
+        window.scrollTo({top: 0, behavior: 'smooth'});
+        syncSharedDatabase();
+    }
+
+    function escapeHTMLCharacters(text) {
+        return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    /* =========================================================
+       ENGINE 5: RUANG MEDIA MUSIK (SHARED LOCALSTORAGE ENGINE)
+       ========================================================= */
+    let databaseTracks = [];
+    const audioCore = document.getElementById('globalAudioCore');
+    const statusPlayback = document.getElementById('statusPlayback');
+    const sharedPlaylistContainer = document.getElementById('sharedPlaylistContainer');
+
+    function syncSharedDatabase() {
+        const localMemory = localStorage.getItem('kelpinz_shared_media_cloud');
+        databaseTracks = localMemory ? JSON.parse(localMemory) : [];
+        renderMusicPlaylistUI();
+    }
+
+    function renderMusicPlaylistUI() {
+        sharedPlaylistContainer.innerHTML = '';
+        if(databaseTracks.length === 0) {
+            sharedPlaylistContainer.innerHTML = `<div style="font-size:11px; color:#475569; text-align:center; padding:20px;">Daftar putar publik kosong.</div>`;
+            return;
+        }
+
+        databaseTracks.forEach((track, index) => {
+            const card = document.createElement('div');
+            card.className = 'track-card';
+            card.innerHTML = `
+                <div class="track-name-click" onclick="executeTrackPlay(${index})">
+                    <i class="fa-solid fa-play" style="color:#38bdf8; margin-right:8px; font-size:10px;"></i> ${track.title}
+                </div>
+                <button class="btn-delete-public" onclick="executeDeletePublicTrack(${index}, event)" title="Hapus Publik">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+            `;
+            sharedPlaylistContainer.appendChild(card);
+        });
+    }
+
+    function processMediaUpload(event) {
+        const file = event.target.files[0];
+        if(!file) return;
+
+        const namePrompt = prompt("Beri nama judul untuk file musik/media publik Anda:", file.name.split('.')[0]);
+        if(!namePrompt) return;
+
+        statusPlayback.textContent = "Sedang mengenkripsi & mengunggah berkas...";
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            const base64Data = e.target.result;
+            const newTrackObject = { title: namePrompt, payload: base64Data };
+
+            databaseTracks.push(newTrackObject);
+            try {
+                localStorage.setItem('kelpinz_shared_media_cloud', JSON.stringify(databaseTracks));
+                syncSharedDatabase();
+                statusPlayback.textContent = "Unggahan berhasil dibagikan!";
+                executeTrackPlay(databaseTracks.length - 1);
+            } catch (err) {
+                alert("Ukuran file media Anda terlalu besar! Batas unggah penyimpanan lokal browser adalah di bawah 4MB.");
+                statusPlayback.textContent = "Gagal memproses file.";
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+
+    let activeTrackIndex = -1;
+
+    function executeTrackPlay(index) {
+        if(index < 0 || index >= databaseTracks.length) return;
+        activeTrackIndex = index;
+
+        audioCore.src = databaseTracks[index].payload;
+        audioCore.play();
+        statusPlayback.innerHTML = `<span style="color:#34c759; font-weight:700;">Memutar:</span> ${databaseTracks[index].title}`;
+    }
+
+    function controlTrackPower(action) {
+        if(!audioCore.src && databaseTracks.length > 0) {
+            executeTrackPlay(0);
+            return;
+        }
+        if(action === 'play') audioCore.play();
+        else audioCore.pause();
+    }
+
+    function executeDeletePublicTrack(index, event) {
+        event.stopPropagation(); // Menjaga agar lagu tidak otomatis terpilih saat menekan tombol hapus
+        const agreement = confirm(`Hapus secara publik media "${databaseTracks[index].title}" dari semua perangkat?`);
+        
+        if(agreement) {
+            if(activeTrackIndex === index) {
+                audioCore.pause();
+                audioCore.src = "";
+                statusPlayback.textContent = "Musik aktif dihapus.";
+                activeTrackIndex = -1;
+            } else if (activeTrackIndex > index) {
+                activeTrackIndex--;
+            }
+
+            databaseTracks.splice(index, 1);
+            localStorage.setItem('kelpinz_shared_media_cloud', JSON.stringify(databaseTracks));
+            syncSharedDatabase();
+        }
+    }
+
+    // Jalankan sinkronisasi database musik saat aplikasi pertama dibuka
+    syncSharedDatabase();
+</script>
+
+</body>
+</html>
